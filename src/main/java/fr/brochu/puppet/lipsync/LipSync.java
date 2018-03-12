@@ -12,7 +12,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LipSync {
+public class LipSync implements ProgressListener {
     private static final String ACOUSTIC_MODEL_PATH = "resource:/fr/brochu/puppet/lipsync/fr-fr/fr-fr";
     private static final String WORD_DICTIONARY_PATH = "resource:/fr/brochu/puppet/lipsync/fr-fr/fr.dict";
     private static final String PHONE_DICTIONARY_PATH = "resource:/fr/brochu/puppet/lipsync/fr-fr/fr-phone.dict";
@@ -27,6 +27,8 @@ public class LipSync {
     private List<AlignedWord> alignedWords;
     private List<AlignedWord> alignedPhones;
     private AlignmentStats alignmentStats;
+    private double progress = 0;
+    private ProgressListener progressListener;
 
 
     public static void main(String args[]) throws Exception {
@@ -34,12 +36,27 @@ public class LipSync {
 //        String transcriptPath = "E:\\Documents\\Programmation\\sphinx4-5prealpha-src\\sphinx4-samples\\src\\main\\resources\\edu\\cmu\\sphinx\\demo\\aligner\\transcript.txt";
         String wavPath = "test_data/diplotot20.wav";
         String transcriptPath = "test_data/transcript20.txt";
-        LipSync lipSync = new LipSync(wavPath, transcriptPath);
+        LipSync lipSync = new LipSync(wavPath, transcriptPath, new ProgressListener() {
+            @Override
+            public void onStart() {
+
+            }
+
+            @Override
+            public void onProgress(double progress) {
+
+            }
+
+            @Override
+            public void onStop() {
+
+            }
+        });
         lipSync.sync();
         lipSync.exportPapagayo(wavPath.replace(".wav", ".pgo"));
     }
 
-    private void exportPapagayo(String filePath) throws IOException {
+    public void exportPapagayo(String filePath) throws IOException {
         File file = new File(filePath);
         file.createNewFile();
         PapagayoExporter exporter = new PapagayoExporter(alignedWords, alignedPhones, this.transcript.getWordIndexes(), wavPath);
@@ -47,15 +64,12 @@ public class LipSync {
         fileOutputStream.write(exporter.toString().getBytes("ISO-8859-1"));
         fileOutputStream.close();
         System.err.println(exporter.toString());
-
-        // Open file
-        Runtime runtime = Runtime.getRuntime();
-        runtime.exec("Papagayo \"" + filePath + "\"");
     }
 
-    public LipSync(String wavPath, String transcriptPath) throws IOException {
+    public LipSync(String wavPath, String transcriptPath, ProgressListener progressListener) throws IOException {
         this.wavPath = wavPath;
         this.transcriptPath = transcriptPath;
+        this.progressListener = progressListener;
         this.alignmentStats = new AlignmentStats();
 
         readTranscript();
@@ -72,10 +86,11 @@ public class LipSync {
     }
 
     public void sync() throws IOException {
-        this.alignedWords = getAlignedPhones(this.transcript.getText(), WORD_DICTIONARY_PATH);
+        this.progressListener.onStart();
+        this.alignedWords = getAlignedPhones(this.transcript.getText(), WORD_DICTIONARY_PATH, new PartialProgressListener(this, 0, 30));
         System.err.printf("#####Words: %s\n", alignedWords);
         transcript.updateWordsPronunciation(alignedWords);
-        this.alignedPhones = getAlignedPhones(this.transcript.toPhoneString(), PHONE_DICTIONARY_PATH);
+        this.alignedPhones = getAlignedPhones(this.transcript.toPhoneString(), PHONE_DICTIONARY_PATH, new PartialProgressListener(this, 30, 100));
         System.err.printf("#####Phones: %s\n", alignedPhones);
 
         dumpAlignmentState();
@@ -85,6 +100,8 @@ public class LipSync {
         fixIncompleteWords();
         fixWordBoundaries();
         fixMissingWords();
+        this.progressListener.onProgress(100);
+        this.progressListener.onStop();
     }
 
     private void fixWordBoundaries() {
@@ -264,7 +281,7 @@ public class LipSync {
         }
         else {
             for (int i = wordIndex - 1; i >= 0; i--) {
-                if (!alignedWords.get(i).ignored) {
+                if (!alignedWords.get(i).ignored && !alignedWords.get(i).deleted) {
                     wordStart = alignedWords.get(i).getBestTimeFrame().getEnd() + 10;
                     break;
                 }
@@ -275,7 +292,7 @@ public class LipSync {
         }
         else {
             for (int i = wordIndex + 1; i < alignedWords.size(); i++) {
-                if (!alignedWords.get(i).ignored) {
+                if (!alignedWords.get(i).ignored && !alignedWords.get(i).deleted) {
                     wordEnd = alignedWords.get(i).getBestTimeFrame().getStart();
                     break;
                 }
@@ -620,11 +637,11 @@ public class LipSync {
         System.err.println(alignmentStats.toString());
     }
 
-    private List<AlignedWord> getAlignedPhones(String transcript, String dictionaryPath) throws IOException {
+    private List<AlignedWord> getAlignedPhones(String transcript, String dictionaryPath, ProgressListener progressListener) throws IOException {
         URL audioUrl = new File(this.wavPath).toURI().toURL();
 
 
-        PhoneticSpeechAligner aligner = new PhoneticSpeechAligner(ACOUSTIC_MODEL_PATH, dictionaryPath, G2P_MODEL_PATH);
+        PhoneticSpeechAligner aligner = new PhoneticSpeechAligner(ACOUSTIC_MODEL_PATH, dictionaryPath, G2P_MODEL_PATH, progressListener);
 
 
         List<WordResult> results = aligner.align(audioUrl, transcript);
@@ -673,4 +690,52 @@ public class LipSync {
         return alignedPhones;
     }
 
+    @Override
+    public void onStart() {
+
+    }
+
+    @Override
+    public void onProgress(double progress) {
+        if (progress != this.progress) {
+            this.progressListener.onProgress(progress);
+            this.progress = progress;
+        }
+    }
+
+    @Override
+    public void onStop() {
+
+    }
+
+    private class PartialProgressListener implements ProgressListener {
+        private final double startProgress;
+        private final double endProgress;
+        private final ProgressListener progressListener;
+        private double progress = 0;
+
+        public PartialProgressListener(ProgressListener progressListener, double startProgress, double endProgress) {
+            this.progressListener = progressListener;
+            this.startProgress = startProgress;
+            this.endProgress = endProgress;
+        }
+
+        @Override
+        public void onStart() {
+
+        }
+
+        @Override
+        public void onProgress(double progress) {
+            if (progress != this.progress) {
+                this.progress = progress;
+                this.progressListener.onProgress(startProgress + (endProgress - startProgress) * progress);
+            }
+        }
+
+        @Override
+        public void onStop() {
+
+        }
+    }
 }

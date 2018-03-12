@@ -31,10 +31,13 @@ public class PhoneticSpeechAligner {
     private final Recognizer recognizer;
     private final AlignerGrammar grammar;
     private final DynamicTrigramModel languageModel;
+    private final ProgressListener progressListener;
+    private double progress = 0;
 
     private TextTokenizer tokenizer;
 
-    public PhoneticSpeechAligner(String amPath, String dictPath, String g2pPath) throws MalformedURLException, IOException {
+    public PhoneticSpeechAligner(String amPath, String dictPath, String g2pPath, ProgressListener progressListener) throws MalformedURLException, IOException {
+        this.progressListener = progressListener;
         Configuration configuration = new Configuration();
         configuration.setAcousticModelPath(amPath);
         configuration.setDictionaryPath(dictPath);
@@ -64,6 +67,7 @@ public class PhoneticSpeechAligner {
      * @throws IOException if IO went wrong
      */
     public List<WordResult> align(URL audioUrl, List<String> sentenceTranscript) throws IOException {
+        progressListener.onStart();
 
         List<String> transcript = sentenceToWords(sentenceTranscript);
 
@@ -111,6 +115,12 @@ public class PhoneticSpeechAligner {
                     logger.info("Utterance result " + result.getTimedBestResult(true));
                     logger.info("Utterance Pronunciation: " + result.getBestPronunciationResult());
                     List<WordResult> bestWordResults = result.getTimedBestResult(false);
+
+                    double newProgress = progress + (double)bestWordResults.size() / text.size();
+                    if (newProgress != progress && i == 0) {
+                        this.progressListener.onProgress(newProgress);
+                    }
+                    progress = newProgress;
 
                     // Record Best pronunciation and remove other ones.
                     Token token = result.getBestFinalToken();
@@ -160,6 +170,7 @@ public class PhoneticSpeechAligner {
 
             scheduleNextAlignment(transcript, alignedWords, ranges, texts, timeFrames, lastFrame);
         }
+        this.progressListener.onStop();
 
         return new ArrayList<WordResult>(alignedWords.values());
     }
