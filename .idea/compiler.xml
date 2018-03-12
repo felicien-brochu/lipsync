@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <bytecodeTargetLevel>
+      <module name="lipsync_main" target="1.7" />
+      <module name="lipsync_test" target="1.7" />
+      <module name="sphinx4-core_main" target="1.7" />
+      <module name="sphinx4-core_test" target="1.7" />
+      <module name="sphinx4-data_main" target="1.7" />
+      <module name="sphinx4-data_test" target="1.7" />
+      <module name="sphinx4-samples_main" target="1.7" />
+      <module name="sphinx4-samples_test" target="1.7" />
+    </bytecodeTargetLevel>
+  </component>
+</project>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/lipsync.iml" filepath="$PROJECT_DIR$/.idea/modules/lipsync.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/lipsync_main.iml" filepath="$PROJECT_DIR$/.idea/modules/lipsync_main.iml" group="lipsync" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/lipsync_test.iml" filepath="$PROJECT_DIR$/.idea/modules/lipsync_test.iml" group="lipsync" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/sphinx4-core/sphinx4-core.iml" filepath="$PROJECT_DIR$/.idea/modules/sphinx4-core/sphinx4-core.iml" group="sphinx4-core" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/sphinx4-core/sphinx4-core_main.iml" filepath="$PROJECT_DIR$/.idea/modules/sphinx4-core/sphinx4-core_main.iml" group="sphinx4-core" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/sphinx4-core/sphinx4-core_test.iml" filepath="$PROJECT_DIR$/.idea/modules/sphinx4-core/sphinx4-core_test.iml" group="sphinx4-core" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/sphinx4-data/sphinx4-data.iml" filepath="$PROJECT_DIR$/.idea/modules/sphinx4-data/sphinx4-data.iml" group="sphinx4-data" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/sphinx4-data/sphinx4-data_main.iml" filepath="$PROJECT_DIR$/.idea/modules/sphinx4-data/sphinx4-data_main.iml" group="sphinx4-data" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/sphinx4-data/sphinx4-data_test.iml" filepath="$PROJECT_DIR$/.idea/modules/sphinx4-data/sphinx4-data_test.iml" group="sphinx4-data" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/sphinx4-parent.iml" filepath="$PROJECT_DIR$/.idea/modules/sphinx4-parent.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/sphinx4-samples/sphinx4-samples.iml" filepath="$PROJECT_DIR$/.idea/modules/sphinx4-samples/sphinx4-samples.iml" group="sphinx4-samples" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/sphinx4-samples/sphinx4-samples_main.iml" filepath="$PROJECT_DIR$/.idea/modules/sphinx4-samples/sphinx4-samples_main.iml" group="sphinx4-samples" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/sphinx4-samples/sphinx4-samples_test.iml" filepath="$PROJECT_DIR$/.idea/modules/sphinx4-samples/sphinx4-samples_test.iml" group="sphinx4-samples" />
+    </modules>
+  </component>
+</project>

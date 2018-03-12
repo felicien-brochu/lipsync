@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module external.linked.project.id=":sphinx4-samples" external.linked.project.path="$MODULE_DIR$/../../../../sphinx4/sphinx4-samples" external.root.project.path="$MODULE_DIR$/../../../../sphinx4" external.system.id="GRADLE" external.system.module.group="edu.cmu.sphinx" external.system.module.version="5prealpha-SNAPSHOT" type="JAVA_MODULE" version="4">
+  <component name="NewModuleRootManager" inherit-compiler-output="true">
+    <exclude-output />
+    <content url="file://$MODULE_DIR$/../../../../sphinx4/sphinx4-samples">
+      <excludeFolder url="file://$MODULE_DIR$/../../../../sphinx4/sphinx4-samples/.gradle" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../../sphinx4/sphinx4-samples/build" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../../sphinx4/sphinx4-samples/out" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+</module>
