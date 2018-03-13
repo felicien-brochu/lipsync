@@ -12,9 +12,11 @@ public class MainFrame extends JFrame implements ActionListener, ProgressListene
     private final JLabel wavLabel;
     private final JLabel transcriptLabel;
     private final JButton syncButton;
+    private final JButton resultFolderButton;
     private final JProgressBar progressBar;
     private File wavFile;
     private File transcriptFile;
+    private LipSync lipSync;
 
     public MainFrame() {
         super();
@@ -53,9 +55,19 @@ public class MainFrame extends JFrame implements ActionListener, ProgressListene
         mainPanel.add(progressBar, BorderLayout.NORTH);
 
         mainPanel.add(centerPanel, BorderLayout.CENTER);
+
+        JPanel buttonsPanel = new JPanel();
+        buttonsPanel.setLayout(new BorderLayout());
         syncButton = new JButton("Sync");
         syncButton.addActionListener(this);
-        mainPanel.add(syncButton, BorderLayout.SOUTH);
+        buttonsPanel.add(syncButton, BorderLayout.CENTER);
+
+        resultFolderButton = new JButton("Open Folder");
+        resultFolderButton.setEnabled(false);
+        resultFolderButton.addActionListener(this);
+        buttonsPanel.add(resultFolderButton, BorderLayout.EAST);
+
+        mainPanel.add(buttonsPanel, BorderLayout.SOUTH);
 
         this.setContentPane(mainPanel);
         this.setVisible(true);
@@ -84,22 +96,27 @@ public class MainFrame extends JFrame implements ActionListener, ProgressListene
                 e1.printStackTrace();
             }
         }
+        else if (e.getSource() == resultFolderButton) {
+            openResultFolder();
+        }
+    }
+
+    private void openResultFolder() {
+        try {
+            Desktop.getDesktop().open(this.lipSync.getResultFolder());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void startSyncing() throws IOException {
         syncButton.setEnabled(false);
-        final LipSync lipSync = new LipSync(this.wavFile.getAbsolutePath(), this.transcriptFile.getAbsolutePath(), this);
+        lipSync = new LipSync(this.wavFile.getAbsolutePath(), this.transcriptFile.getAbsolutePath(), this);
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
                 try {
                     lipSync.sync();
-                    String papagayoFile = wavFile.getAbsolutePath().replace(".wav", ".pgo");
-                    lipSync.exportPapagayo(papagayoFile);
-
-//                    // Open file
-//                    Runtime runtime = Runtime.getRuntime();
-//                    runtime.exec("Papagayo \"" + papagayoFile + "\"");
 
                     java.awt.Toolkit.getDefaultToolkit().beep();
                 } catch (IOException e) {
@@ -124,5 +141,6 @@ public class MainFrame extends JFrame implements ActionListener, ProgressListene
     @Override
     public void onStop() {
         syncButton.setEnabled(true);
+        resultFolderButton.setEnabled(true);
     }
 }

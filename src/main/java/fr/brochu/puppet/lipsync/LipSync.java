@@ -29,32 +29,8 @@ public class LipSync implements ProgressListener {
     private AlignmentStats alignmentStats;
     private double progress = 0;
     private ProgressListener progressListener;
+    private File resultFolder;
 
-
-    public static void main(String args[]) throws Exception {
-//        String wavPath = "diplotot.wav";
-//        String transcriptPath = "E:\\Documents\\Programmation\\sphinx4-5prealpha-src\\sphinx4-samples\\src\\main\\resources\\edu\\cmu\\sphinx\\demo\\aligner\\transcript.txt";
-        String wavPath = "test_data/diplotot20.wav";
-        String transcriptPath = "test_data/transcript20.txt";
-        LipSync lipSync = new LipSync(wavPath, transcriptPath, new ProgressListener() {
-            @Override
-            public void onStart() {
-
-            }
-
-            @Override
-            public void onProgress(double progress) {
-
-            }
-
-            @Override
-            public void onStop() {
-
-            }
-        });
-        lipSync.sync();
-        lipSync.exportPapagayo(wavPath.replace(".wav", ".pgo"));
-    }
 
     public void exportPapagayo(String filePath) throws IOException {
         File file = new File(filePath);
@@ -87,6 +63,9 @@ public class LipSync implements ProgressListener {
 
     public void sync() throws IOException {
         this.progressListener.onStart();
+
+        createResultFolder();
+        createLogFile();
         this.alignedWords = getAlignedPhones(this.transcript.getText(), WORD_DICTIONARY_PATH, new PartialProgressListener(this, 0, 30));
         System.err.printf("#####Words: %s\n", alignedWords);
         transcript.updateWordsPronunciation(alignedWords);
@@ -100,8 +79,46 @@ public class LipSync implements ProgressListener {
         fixIncompleteWords();
         fixWordBoundaries();
         fixMissingWords();
+
+        createPapagayoFile();
         this.progressListener.onProgress(100);
         this.progressListener.onStop();
+    }
+
+    private void createPapagayoFile() {
+
+        String papagayoFile = new File(wavPath).getName().replace(".wav", ".pgo");
+        try {
+            exportPapagayo(String.format("%s/%s", resultFolder.getAbsolutePath(), papagayoFile));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void createResultFolder() {
+        String folderPath = new File(wavPath).getAbsolutePath().replace(".wav", "_lipsync");
+        resultFolder = new File(folderPath);
+        if (!resultFolder.exists()) {
+            resultFolder.mkdir();
+        }
+    }
+
+    private void createLogFile() {
+        String fileName = new File(wavPath).getName().replace(".wav", ".log");
+        File logFile = new File(String.format("%s/%s", resultFolder.getAbsolutePath(), fileName));
+        if (!logFile.exists()) {
+            try {
+                logFile.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        try {
+            System.setErr(new PrintStream(new FileOutputStream(logFile)));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void fixWordBoundaries() {
@@ -738,4 +755,42 @@ public class LipSync implements ProgressListener {
 
         }
     }
+
+    public File getResultFolder() {
+        return resultFolder;
+    }
+
+    public List<ReportWord> getReport() {
+        int[] wordIndexes = this.transcript.getWordIndexes();
+        List<ReportWord> report = new ArrayList<>();
+
+        for (int i = 0; i < alignedWords.size(); i++) {
+            AlignedWord alignedWord = alignedWords.get(i);
+            long wordStart = -1, wordEnd = -1;
+            if (!alignedWord.ignored) {
+                TimeFrame timeFrame = alignedWord.getBestTimeFrame();
+                wordStart = timeFrame.getStart();
+                wordEnd = timeFrame.getEnd();
+            }
+
+            List<ReportPhone> phones = new ArrayList<>();
+            int wordOut = i < alignedWords.size() - 1 ? wordIndexes[i + 1] : alignedPhones.size();
+            for (int j = wordIndexes[i]; j < wordOut; j++) {
+                AlignedWord alignedPhone = alignedPhones.get(j);
+                long phoneStart = -1, phoneEnd = -1;
+                if (!alignedWord.ignored) {
+                    TimeFrame timeFrame = alignedWord.getBestTimeFrame();
+                    phoneStart = timeFrame.getStart();
+                    phoneEnd = timeFrame.getEnd();
+                }
+                ReportPhone phone = new ReportPhone(alignedPhone.spelling, alignedPhone.treatments, phoneStart, phoneEnd, alignedPhone.ignored);
+                phones.add(phone);
+            }
+
+            ReportWord word = new ReportWord(alignedWord.spelling, alignedWord.treatments, wordStart, wordEnd, alignedWord.ignored, phones);
+            report.add(word);
+        }
+        return report;
+    }
+
 }
