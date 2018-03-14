@@ -1,1 +1,1 @@
-java -jar -Xmx8000m ./lipsync.jar
+java -jar -Xmx8000m "%~dp0lipsync.jar"
