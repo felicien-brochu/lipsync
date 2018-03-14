@@ -1,0 +1,1 @@
+java -jar -Xmx8000m ./lipsync.jar

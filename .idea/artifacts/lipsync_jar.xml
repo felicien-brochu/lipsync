@@ -9,6 +9,8 @@
         <element id="module-output" name="lipsync" />
       </element>
       <element id="library" level="project" name="edu.cmu.sphinx:sphinx4-core:5prealpha-SNAPSHOT" />
+      <element id="file-copy" path="$PROJECT_DIR$/script/lipsync.bat" />
+      <element id="library" level="project" name="commons-io:commons-io:2.6" />
     </root>
   </artifact>
 </component>
