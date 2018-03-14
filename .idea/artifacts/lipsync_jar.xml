@@ -1,0 +1,14 @@
+<component name="ArtifactManager">
+  <artifact name="lipsync:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/lipsync_jar</output-path>
+    <root id="root">
+      <element id="archive" name="lipsync.jar">
+        <element id="directory" name="META-INF">
+          <element id="file-copy" path="$PROJECT_DIR$/META-INF/MANIFEST.MF" />
+        </element>
+        <element id="module-output" name="lipsync" />
+      </element>
+      <element id="library" level="project" name="edu.cmu.sphinx:sphinx4-core:5prealpha-SNAPSHOT" />
+    </root>
+  </artifact>
+</component>

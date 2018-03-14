@@ -3,6 +3,7 @@ package fr.brochu.puppet.lipsync;
 import edu.cmu.sphinx.alignment.LongTextAligner;
 import edu.cmu.sphinx.result.WordResult;
 import edu.cmu.sphinx.util.TimeFrame;
+import org.apache.commons.io.output.TeeOutputStream;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -16,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LipSync implements ProgressListener {
+    private static final String SPHINX_CONFIG_PATH = "resource:/fr/brochu/puppet/lipsync/sphinx4.config.xml";
     private static final String ACOUSTIC_MODEL_PATH = "resource:/fr/brochu/puppet/lipsync/fr-fr/fr-fr";
     private static final String WORD_DICTIONARY_PATH = "resource:/fr/brochu/puppet/lipsync/fr-fr/fr.dict";
     private static final String PHONE_DICTIONARY_PATH = "resource:/fr/brochu/puppet/lipsync/fr-fr/fr-phone.dict";
@@ -56,7 +58,7 @@ public class LipSync implements ProgressListener {
 
     private void readTranscript() throws IOException {
         String transcriptText = readFile(this.transcriptPath);
-        this.transcript = new Transcript(transcriptText, ACOUSTIC_MODEL_PATH, WORD_DICTIONARY_PATH, G2P_MODEL_PATH);
+        this.transcript = new Transcript(transcriptText, SPHINX_CONFIG_PATH, ACOUSTIC_MODEL_PATH, WORD_DICTIONARY_PATH, G2P_MODEL_PATH);
     }
 
     private static String readFile(String path) throws IOException {
@@ -118,7 +120,8 @@ public class LipSync implements ProgressListener {
         }
 
         try {
-            System.setErr(new PrintStream(new FileOutputStream(logFile)));
+            TeeOutputStream teeOutputStream = new TeeOutputStream(new FileOutputStream(logFile), System.err);
+            System.setErr(new PrintStream(teeOutputStream));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -661,7 +664,7 @@ public class LipSync implements ProgressListener {
         URL audioUrl = new File(this.wavPath).toURI().toURL();
 
 
-        PhoneticSpeechAligner aligner = new PhoneticSpeechAligner(ACOUSTIC_MODEL_PATH, dictionaryPath, G2P_MODEL_PATH, progressListener);
+        PhoneticSpeechAligner aligner = new PhoneticSpeechAligner(SPHINX_CONFIG_PATH, ACOUSTIC_MODEL_PATH, dictionaryPath, G2P_MODEL_PATH, progressListener);
 
 
         List<WordResult> results = aligner.align(audioUrl, transcript);

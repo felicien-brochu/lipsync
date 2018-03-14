@@ -36,13 +36,13 @@ public class PhoneticSpeechAligner {
 
     private TextTokenizer tokenizer;
 
-    public PhoneticSpeechAligner(String amPath, String dictPath, String g2pPath, ProgressListener progressListener) throws MalformedURLException, IOException {
+    public PhoneticSpeechAligner(String sphinxConfigPath, String amPath, String dictPath, String g2pPath, ProgressListener progressListener) throws MalformedURLException, IOException {
         this.progressListener = progressListener;
         Configuration configuration = new Configuration();
         configuration.setAcousticModelPath(amPath);
         configuration.setDictionaryPath(dictPath);
 
-        context = new Context(configuration);
+        context = new Context(sphinxConfigPath, configuration);
         if (g2pPath != null) {
             context.setLocalProperty("dictionary->g2pModelPath", g2pPath);
             context.setLocalProperty("dictionary->g2pMaxPron", "2");

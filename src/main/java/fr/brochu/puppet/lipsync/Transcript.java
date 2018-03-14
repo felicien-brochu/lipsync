@@ -16,7 +16,7 @@ public class Transcript {
     private List<TranscriptWord> words;
     private Dictionary dictionary;
 
-    public Transcript(String transcriptText, String acousticModelPath, String wordDictionaryPath, String g2pModelPath) throws IOException {
+    public Transcript(String transcriptText, String sphinxConfigPath, String acousticModelPath, String wordDictionaryPath, String g2pModelPath) throws IOException {
         this.text = cleanText(transcriptText);
         this.words = new ArrayList<>();
 
@@ -25,7 +25,7 @@ public class Transcript {
         configuration.setAcousticModelPath(acousticModelPath);
         configuration.setDictionaryPath(wordDictionaryPath);
 
-        Context context = new Context(configuration);
+        Context context = new Context(sphinxConfigPath, configuration);
         context.setLocalProperty("dictionary->g2pModelPath", g2pModelPath);
         context.setLocalProperty("dictionary->g2pMaxPron", "2");
         context.setLocalProperty("lexTreeLinguist->languageModel", "dynamicTrigramModel");
