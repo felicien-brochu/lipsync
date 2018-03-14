@@ -1,7 +1,6 @@
 package fr.brochu.puppet.lipsync;
 
 import javax.swing.*;
-import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -14,6 +13,7 @@ public class MainFrame extends JFrame implements ActionListener, ProgressListene
     private final JButton syncButton;
     private final JButton resultFolderButton;
     private final JProgressBar progressBar;
+    private final JButton reportButton;
     private File wavFile;
     private File transcriptFile;
     private LipSync lipSync;
@@ -62,10 +62,21 @@ public class MainFrame extends JFrame implements ActionListener, ProgressListene
         syncButton.addActionListener(this);
         buttonsPanel.add(syncButton, BorderLayout.CENTER);
 
+
+        JPanel resultPanel = new JPanel();
+        resultPanel.setLayout(new GridLayout(2, 1));
+
         resultFolderButton = new JButton("Open Folder");
         resultFolderButton.setEnabled(false);
         resultFolderButton.addActionListener(this);
-        buttonsPanel.add(resultFolderButton, BorderLayout.EAST);
+        resultPanel.add(resultFolderButton);
+
+        reportButton = new JButton("Report");
+        reportButton.setEnabled(false);
+        reportButton.addActionListener(this);
+        resultPanel.add(reportButton);
+
+        buttonsPanel.add(resultPanel, BorderLayout.EAST);
 
         mainPanel.add(buttonsPanel, BorderLayout.SOUTH);
 
@@ -98,6 +109,9 @@ public class MainFrame extends JFrame implements ActionListener, ProgressListene
         }
         else if (e.getSource() == resultFolderButton) {
             openResultFolder();
+        }
+        else if (e.getSource() == reportButton) {
+            showReportWindow();
         }
     }
 
@@ -142,5 +156,11 @@ public class MainFrame extends JFrame implements ActionListener, ProgressListene
     public void onStop() {
         syncButton.setEnabled(true);
         resultFolderButton.setEnabled(true);
+        reportButton.setEnabled(true);
+        showReportWindow();
+    }
+
+    private void showReportWindow() {
+        new ReportFrame(lipSync.getReport());
     }
 }

@@ -4,7 +4,10 @@ import edu.cmu.sphinx.alignment.LongTextAligner;
 import edu.cmu.sphinx.result.WordResult;
 import edu.cmu.sphinx.util.TimeFrame;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -775,11 +778,11 @@ public class LipSync implements ProgressListener {
 
             List<ReportPhone> phones = new ArrayList<>();
             int wordOut = i < alignedWords.size() - 1 ? wordIndexes[i + 1] : alignedPhones.size();
-            for (int j = wordIndexes[i]; j < wordOut; j++) {
+            for (int j = wordIndexes[i]; j < wordOut && !alignedWord.ignored; j++) {
                 AlignedWord alignedPhone = alignedPhones.get(j);
                 long phoneStart = -1, phoneEnd = -1;
-                if (!alignedWord.ignored) {
-                    TimeFrame timeFrame = alignedWord.getBestTimeFrame();
+                if (!alignedPhone.ignored) {
+                    TimeFrame timeFrame = alignedPhone.getBestTimeFrame();
                     phoneStart = timeFrame.getStart();
                     phoneEnd = timeFrame.getEnd();
                 }

@@ -1,7 +1,6 @@
 package fr.brochu.puppet.lipsync;
 
 public enum Treatment {
-    NORMAL,
     INWORD_NORMAL_GAP,
     INWORD_BIG_GAP,
     INWORD_SMALL_GAP,
