@@ -121,10 +121,8 @@ public class PapagayoExporter {
         StringBuilder phoneSb = new StringBuilder();
         for (int i = 0; i < wordLength; i++) {
             AlignedWord phone = alignedPhones.get(wordIndexes[wordIndex] + i);
-            if (!phone.ignored) {
-                phoneCount++;
-                phoneSb.append("\t\t\t\t" + timeToFrame(phone.getBestTimeFrame().getStart()) + " " + phoneToMouthShape(phone.spelling) + "\n");
-            }
+            phoneCount++;
+            phoneSb.append("\t\t\t\t" + getPhoneStart(wordIndexes[wordIndex], i) + " " + phoneToMouthShape(phone.spelling) + "\n");
         }
         StringBuilder sb = new StringBuilder();
         sb
@@ -136,6 +134,27 @@ public class PapagayoExporter {
                 .append(phoneSb);
 
         return  sb.toString();
+    }
+
+    private long getPhoneStart(int wordIndex, int phoneIndex) {
+        AlignedWord phone = alignedPhones.get(wordIndex + phoneIndex);
+        long start = -1;
+        if (!phone.ignored) {
+            start = timeToFrame(phone.getBestTimeFrame().getStart());
+        } else {
+            for (int i = phoneIndex; i >= 0; i--) {
+                AlignedWord prevPhone = alignedPhones.get(wordIndex + i);
+                if (!prevPhone.ignored) {
+                    start = timeToFrame(prevPhone.getBestTimeFrame().getEnd());
+                    break;
+                }
+            }
+            if (start < 0) {
+                AlignedWord alignedWord = alignedWords.get(wordIndex);
+                start = timeToFrame(alignedWord.getBestTimeFrame().getStart());
+            }
+        }
+        return start;
     }
 
     /**
