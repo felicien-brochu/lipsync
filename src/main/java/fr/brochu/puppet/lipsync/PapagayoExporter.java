@@ -43,7 +43,7 @@ public class PapagayoExporter {
         phoneShapeMap.put("ss", "etc");
         phoneShapeMap.put("tt", "etc");
         phoneShapeMap.put("un", "E");
-        phoneShapeMap.put("uu", "O");
+        phoneShapeMap.put("uu", "U");
         phoneShapeMap.put("uy", "E");
         phoneShapeMap.put("vv", "FV");
         phoneShapeMap.put("ww", "WQ");
@@ -122,7 +122,7 @@ public class PapagayoExporter {
         for (int i = 0; i < wordLength; i++) {
             AlignedWord phone = alignedPhones.get(wordIndexes[wordIndex] + i);
             phoneCount++;
-            phoneSb.append("\t\t\t\t" + getPhoneStart(wordIndexes[wordIndex], i) + " " + phoneToMouthShape(phone.spelling) + "\n");
+            phoneSb.append("\t\t\t\t" + getPhoneStart(wordIndex, i) + " " + phoneToMouthShape(phone.spelling) + "\n");
         }
         StringBuilder sb = new StringBuilder();
         sb
@@ -137,13 +137,13 @@ public class PapagayoExporter {
     }
 
     private long getPhoneStart(int wordIndex, int phoneIndex) {
-        AlignedWord phone = alignedPhones.get(wordIndex + phoneIndex);
+        AlignedWord phone = alignedPhones.get(wordIndexes[wordIndex] + phoneIndex);
         long start = -1;
         if (!phone.ignored) {
             start = timeToFrame(phone.getBestTimeFrame().getStart());
         } else {
             for (int i = phoneIndex; i >= 0; i--) {
-                AlignedWord prevPhone = alignedPhones.get(wordIndex + i);
+                AlignedWord prevPhone = alignedPhones.get(wordIndexes[wordIndex] + i);
                 if (!prevPhone.ignored) {
                     start = timeToFrame(prevPhone.getBestTimeFrame().getEnd());
                     break;
